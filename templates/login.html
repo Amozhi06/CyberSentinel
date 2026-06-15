@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CyberSentinel — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080b12;--surface:#0d1117;--panel:#111820;--border:#1e2d3d;
+  --accent:#00e5ff;--accent2:#7c3aed;--green:#00ff88;--red:#ff3b5c;
+  --text:#c9d1d9;--muted:#586069;
+  --mono:'Share Tech Mono',monospace;--sans:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--sans);
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:24px;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(0,229,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,.03) 1px,transparent 1px);
+  background-size:44px 44px;
+}
+.orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none}
+.orb1{width:450px;height:450px;background:var(--accent2);top:-120px;right:-120px;opacity:.3}
+.orb2{width:350px;height:350px;background:var(--accent);bottom:-80px;left:-80px;opacity:.1}
+
+/* ── Back link ── */
+.back{
+  position:fixed;top:20px;left:24px;z-index:10;
+  text-decoration:none;font-family:var(--mono);font-size:12px;
+  color:var(--muted);display:flex;align-items:center;gap:6px;transition:color .2s;
+}
+.back:hover{color:var(--accent)}
+
+/* ── Card ── */
+.card{
+  position:relative;z-index:1;
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:16px;padding:40px 36px;width:100%;max-width:420px;
+  box-shadow:0 0 80px rgba(0,229,255,.04);
+}
+.logo{text-align:center;margin-bottom:32px}
+.logo-icon{font-size:36px;display:block;margin-bottom:8px}
+.logo-name{
+  font-family:var(--mono);font-size:20px;color:var(--accent);
+  letter-spacing:.12em;display:block;
+}
+.logo-sub{font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:.05em}
+
+/* ── Tabs ── */
+.tabs{
+  display:flex;gap:0;margin-bottom:28px;
+  background:var(--surface);border-radius:8px;padding:3px;
+}
+.tab{
+  flex:1;padding:9px;text-align:center;
+  font-family:var(--mono);font-size:12px;letter-spacing:.08em;
+  color:var(--muted);cursor:pointer;border-radius:6px;transition:all .2s;
+  user-select:none;
+}
+.tab.active{
+  background:var(--panel);color:var(--accent);
+  border:1px solid var(--border);
+}
+
+/* ── Form ── */
+.form{display:none}
+.form.active{display:block}
+
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.field label{font-size:11px;color:var(--muted);font-family:var(--mono);letter-spacing:.07em}
+.field input{
+  background:var(--surface);border:1px solid var(--border);border-radius:7px;
+  color:var(--text);font-family:var(--mono);font-size:13px;
+  padding:11px 14px;outline:none;transition:border-color .2s;width:100%;
+}
+.field input:focus{border-color:var(--accent)}
+.field input.shake{animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* strength bar */
+.strength-bar{height:3px;background:var(--border);border-radius:2px;margin-top:5px;overflow:hidden}
+.strength-fill{height:100%;border-radius:2px;transition:all .35s;width:0}
+
+/* terms */
+.check-row{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5;
+}
+.check-row input{margin-top:2px;accent-color:var(--accent)}
+
+.btn{
+  width:100%;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.35);
+  color:var(--accent);font-family:var(--mono);font-size:12px;letter-spacing:.1em;
+  padding:12px;border-radius:7px;cursor:pointer;transition:all .2s;
+  text-transform:uppercase;margin-top:4px;
+}
+.btn:hover{background:rgba(0,229,255,.18)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* messages */
+.msg{
+  display:none;padding:10px 14px;border-radius:7px;
+  font-size:12px;font-family:var(--mono);margin-top:14px;border:1px solid;
+}
+.msg.show{display:block}
+.msg.error{color:var(--red);border-color:rgba(255,59,92,.3);background:rgba(255,59,92,.07)}
+.msg.success{color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.07)}
+
+.note{font-size:11px;color:var(--muted);text-align:center;margin-top:18px;font-family:var(--mono)}
+
+/* spinner */
+.spinner{
+  display:inline-block;width:11px;height:11px;
+  border:2px solid rgba(0,229,255,.2);border-top-color:var(--accent);
+  border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<a href="/" class="back">← Back to home</a>
+
+<div class="card">
+  <div class="logo">
+    <span class="logo-icon">⬡</span>
+    <span class="logo-name">CYBERSENTINEL</span>
+    <div class="logo-sub">SECURITY OPERATIONS CENTER</div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-login"    onclick="switchTab('login')">LOGIN</div>
+    <div class="tab"        id="tab-register" onclick="switchTab('register')">REGISTER</div>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="form active" id="form-login">
+    <div class="field">
+      <label>USERNAME OR EMAIL</label>
+      <input type="text" id="l-id" placeholder="your_name or email@example.com" autocomplete="username"/>
+    </div>
+    <div class="field">
+      <label>PASSWORD</label>
+      <input type="password" id="l-pwd" placeholder="••••••••" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <button class="btn" id="login-btn" onclick="doLogin()">▶ LOGIN</button>
+    <div class="msg" id="login-msg"></div>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="form" id="form-register">
+    <div class="field">
+      <label>USERNAME</label>
+      <input type="text" id="r-user" placeholder="at least 3 characters" maxlength="30" autocomplete="username"/>
+    </div>
+    <div class="field">
+      <label>EMAIL</label>
+      <input type="email" id="r-email" placeholder="you@example.com" autocomplete="email"/>
+    </div>
+    <div class="field">
+      <label>PASSWORD</label>
+      <input type="password" id="r-pwd" placeholder="at least 8 characters"
+             autocomplete="new-password" oninput="updateStrength(this.value)"/>
+      <div class="strength-bar"><div class="strength-fill" id="s-fill"></div></div>
+    </div>
+    <div class="field">
+      <label>CONFIRM PASSWORD</label>
+      <input type="password" id="r-pwd2" placeholder="repeat password"
+             autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()"/>
+    </div>
+    <div class="check-row">
+      <input type="checkbox" id="agree"/>
+      <label for="agree">I agree to use this tool for educational and ethical purposes only.</label>
+    </div>
+    <button class="btn" id="reg-btn" onclick="doRegister()">▶ CREATE ACCOUNT</button>
+    <div class="msg" id="reg-msg"></div>
+  </div>
+
+  <div class="note">Data stored locally on your server · No tracking</div>
+</div>
+
+<script>
+// Auto-switch to register tab if URL hash is #register
+if (window.location.hash === '#register') switchTab('register');
+
+function switchTab(tab) {
+  ['login','register'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('form-'+t).classList.toggle('active', t===tab);
+  });
+}
+
+function updateStrength(pwd) {
+  let s = 0;
+  if (pwd.length >= 8)          s++;
+  if (pwd.length >= 12)         s++;
+  if (/[A-Z]/.test(pwd))       s++;
+  if (/[0-9]/.test(pwd))       s++;
+  if (/[^a-zA-Z0-9]/.test(pwd)) s++;
+  const fill = document.getElementById('s-fill');
+  fill.style.width  = (s/5*100) + '%';
+  fill.style.background = s < 2 ? '#ff3b5c' : s < 4 ? '#ffd700' : '#00ff88';
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg show ' + type;
+}
+
+async function doLogin() {
+  const identifier = document.getElementById('l-id').value.trim();
+  const password   = document.getElementById('l-pwd').value;
+  if (!identifier || !password) return showMsg('login-msg','Please fill in all fields.','error');
+
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>LOGGING IN...';
+  try {
+    const res = await fetch('/api/login',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({identifier,password})
+    });
+    const d = await res.json();
+    if (d.error) { showMsg('login-msg', d.error, 'error'); }
+    else {
+      showMsg('login-msg', `✓ Welcome back, ${d.username}! Redirecting...`, 'success');
+      setTimeout(() => window.location = '/dashboard', 700);
+    }
+  } catch { showMsg('login-msg','Server error. Is Flask running?','error'); }
+  finally { btn.disabled=false; btn.innerHTML='▶ LOGIN'; }
+}
+
+async function doRegister() {
+  const username = document.getElementById('r-user').value.trim();
+  const email    = document.getElementById('r-email').value.trim();
+  const password = document.getElementById('r-pwd').value;
+  const confirm  = document.getElementById('r-pwd2').value;
+
+  if (!username||!email||!password||!confirm)
+    return showMsg('reg-msg','Please fill in all fields.','error');
+  if (password !== confirm)
+    return showMsg('reg-msg','Passwords do not match.','error');
+  if (!document.getElementById('agree').checked)
+    return showMsg('reg-msg','Please accept the terms to continue.','error');
+
+  const btn = document.getElementById('reg-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>CREATING ACCOUNT...';
+  try {
+    const res = await fetch('/api/register',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username,email,password})
+    });
+    const d = await res.json();
+    if (d.error) { showMsg('reg-msg', d.error, 'error'); }
+    else {
+      showMsg('reg-msg','✓ Account created! Switching to login...','success');
+      setTimeout(() => {
+        switchTab('login');
+        document.getElementById('l-id').value = username;
+      }, 1100);
+    }
+  } catch { showMsg('reg-msg','Server error. Is Flask running?','error'); }
+  finally { btn.disabled=false; btn.innerHTML='▶ CREATE ACCOUNT'; }
+}
+</script>
+</body>
+</html>

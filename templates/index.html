@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CyberSentinel — AI-Powered Security</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#080b12; --surface:#0d1117; --panel:#111820; --border:#1e2d3d;
+  --accent:#00e5ff; --accent2:#7c3aed; --green:#00ff88; --red:#ff3b5c;
+  --text:#c9d1d9; --muted:#586069;
+  --mono:'Share Tech Mono',monospace; --sans:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:var(--sans);overflow-x:hidden;
+}
+
+/* ── Grid BG ── */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,229,255,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,.04) 1px,transparent 1px);
+  background-size:50px 50px;
+}
+
+/* ── Glow orbs ── */
+.orb{
+  position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;opacity:.35;
+}
+.orb1{width:500px;height:500px;background:var(--accent2);top:-150px;right:-150px;}
+.orb2{width:400px;height:400px;background:var(--accent);bottom:-100px;left:-100px;opacity:.15;}
+
+/* ── Nav ── */
+nav{
+  position:fixed;top:0;width:100%;z-index:100;
+  padding:16px 40px;display:flex;align-items:center;justify-content:space-between;
+  background:rgba(8,11,18,.8);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{font-family:var(--mono);font-size:18px;color:var(--accent);letter-spacing:.1em}
+.nav-links{display:flex;gap:8px}
+.nav-links a{
+  text-decoration:none;font-size:13px;padding:8px 18px;border-radius:6px;
+  font-family:var(--mono);letter-spacing:.06em;transition:all .2s;
+}
+.nav-links .btn-outline{
+  color:var(--muted);border:1px solid var(--border);
+}
+.nav-links .btn-outline:hover{color:var(--accent);border-color:var(--accent)}
+.nav-links .btn-fill{
+  color:#000;background:var(--accent);border:1px solid var(--accent);font-weight:600;
+}
+.nav-links .btn-fill:hover{background:#00c8e0}
+
+/* ── Hero ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:120px 24px 80px;
+  position:relative;z-index:1;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+  color:var(--accent);border:1px solid rgba(0,229,255,.3);
+  background:rgba(0,229,255,.06);padding:6px 16px;border-radius:20px;
+  margin-bottom:28px;
+}
+.hero-badge::before{
+  content:'';width:6px;height:6px;background:var(--green);
+  border-radius:50%;animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.hero h1{
+  font-size:clamp(40px,7vw,80px);font-weight:700;line-height:1.1;
+  margin-bottom:20px;letter-spacing:-.02em;
+}
+.hero h1 span{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero p{
+  font-size:clamp(15px,2vw,19px);color:var(--muted);
+  max-width:560px;line-height:1.7;margin-bottom:40px;
+}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn-hero-primary{
+  padding:14px 32px;background:var(--accent);color:#000;
+  font-weight:600;font-size:15px;border-radius:8px;
+  text-decoration:none;transition:all .2s;letter-spacing:.02em;
+}
+.btn-hero-primary:hover{background:#00c8e0;transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,229,255,.3)}
+.btn-hero-secondary{
+  padding:14px 32px;background:transparent;color:var(--text);
+  border:1px solid var(--border);font-size:15px;border-radius:8px;
+  text-decoration:none;transition:all .2s;
+}
+.btn-hero-secondary:hover{border-color:var(--accent);color:var(--accent)}
+
+/* stats strip */
+.stats-strip{
+  display:flex;gap:48px;flex-wrap:wrap;justify-content:center;
+  margin-top:64px;padding-top:48px;border-top:1px solid var(--border);
+}
+.stat-item{text-align:center}
+.stat-item .num{font-family:var(--mono);font-size:32px;color:var(--accent)}
+.stat-item .lbl{font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:.04em}
+
+/* ── Features ── */
+.section{padding:80px 24px;max-width:1100px;margin:0 auto;position:relative;z-index:1}
+.section-title{
+  font-family:var(--mono);font-size:11px;color:var(--accent);
+  letter-spacing:.15em;text-align:center;margin-bottom:12px;
+}
+.section-heading{
+  font-size:clamp(24px,4vw,40px);font-weight:700;text-align:center;
+  margin-bottom:48px;letter-spacing:-.01em;
+}
+.features-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;
+}
+.feat-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:12px;padding:28px 24px;
+  transition:all .3s;position:relative;overflow:hidden;
+}
+.feat-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,229,255,.04),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.feat-card:hover{border-color:rgba(0,229,255,.35);transform:translateY(-4px)}
+.feat-card:hover::before{opacity:1}
+.feat-icon{font-size:28px;margin-bottom:14px;display:block}
+.feat-title{font-size:16px;font-weight:600;margin-bottom:8px;color:var(--text)}
+.feat-desc{font-size:13px;color:var(--muted);line-height:1.65}
+
+/* ── How it works ── */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px}
+.step{text-align:center;padding:24px}
+.step-num{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  font-family:var(--mono);font-size:16px;font-weight:bold;color:white;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 16px;
+}
+.step-title{font-size:15px;font-weight:600;margin-bottom:8px}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── CTA ── */
+.cta{
+  text-align:center;padding:80px 24px;position:relative;z-index:1;
+}
+.cta-box{
+  max-width:600px;margin:0 auto;
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:16px;padding:52px 40px;
+  background-image:linear-gradient(135deg,rgba(124,58,237,.1),rgba(0,229,255,.05));
+}
+.cta-box h2{font-size:32px;font-weight:700;margin-bottom:12px}
+.cta-box p{color:var(--muted);margin-bottom:28px;font-size:15px}
+
+/* ── Footer ── */
+footer{
+  text-align:center;padding:32px;
+  border-top:1px solid var(--border);
+  font-family:var(--mono);font-size:11px;color:var(--muted);
+  position:relative;z-index:1;
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- ── Nav ── -->
+<nav>
+  <div class="nav-logo">⬡ CYBERSENTINEL</div>
+  <div class="nav-links">
+    <a href="/login" class="btn-outline">LOGIN</a>
+    <a href="/login#register" class="btn-fill">GET STARTED</a>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="hero-badge">AI-POWERED SECURITY PLATFORM</div>
+  <h1>Protect. Detect.<br><span>Stay Secure.</span></h1>
+  <p>
+    CyberSentinel gives you professional-grade cybersecurity tools —
+    phishing detection, password analysis, network scanning, and file encryption —
+    all in one place.
+  </p>
+  <div class="hero-btns">
+    <a href="/login#register" class="btn-hero-primary">🛡 Get Started Free</a>
+    <a href="#features" class="btn-hero-secondary">See Features →</a>
+  </div>
+
+  <div class="stats-strip">
+    <div class="stat-item"><div class="num">4</div><div class="lbl">Security Modules</div></div>
+    <div class="stat-item"><div class="num">AES‑256</div><div class="lbl">Encryption Standard</div></div>
+    <div class="stat-item"><div class="num">9+</div><div class="lbl">Ports Scanned</div></div>
+    <div class="stat-item"><div class="num">AI</div><div class="lbl">Built-in Assistant</div></div>
+  </div>
+</section>
+
+<!-- ── Features ── -->
+<section class="section" id="features">
+  <div class="section-title">// WHAT WE OFFER</div>
+  <h2 class="section-heading">Everything you need to stay secure</h2>
+  <div class="features-grid">
+    <div class="feat-card">
+      <span class="feat-icon">🔗</span>
+      <div class="feat-title">Phishing Detector</div>
+      <div class="feat-desc">
+        Paste any URL and get an instant risk score. We check for suspicious patterns,
+        missing HTTPS, IP-based domains, and test if the site is actually live.
+      </div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🔑</span>
+      <div class="feat-title">Password Analyzer</div>
+      <div class="feat-desc">
+        Get a full strength report on any password. Detects personal patterns,
+        common passwords, generates SHA-256 hash, and suggests strong alternatives.
+      </div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">📡</span>
+      <div class="feat-title">Vulnerability Scanner</div>
+      <div class="feat-desc">
+        Scan any IP or hostname for open ports. Identifies risky services like Telnet,
+        FTP, and exposed databases with specific remediation advice.
+      </div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🔒</span>
+      <div class="feat-title">File Encryption</div>
+      <div class="feat-desc">
+        Encrypt any file using AES-256 (Fernet). Download the encrypted file and
+        your key separately. Decrypt anytime with the same key.
+      </div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">⚡</span>
+      <div class="feat-title">AI Assistant</div>
+      <div class="feat-desc">
+        Ask any cybersecurity question and get instant expert guidance.
+        Sentinel-AI explains results, teaches concepts, and helps you make
+        better security decisions.
+      </div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">📋</span>
+      <div class="feat-title">Scan History</div>
+      <div class="feat-desc">
+        Every scan is saved to your account. Review your history, track
+        security changes over time, and keep an audit trail of all checks.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How it works ── -->
+<section class="section">
+  <div class="section-title">// HOW IT WORKS</div>
+  <h2 class="section-heading">Up and running in 3 steps</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-title">Create an account</div>
+      <div class="step-desc">Sign up with a username, email, and password. Your data is stored locally on your server.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-title">Choose a tool</div>
+      <div class="step-desc">Pick any of the 4 security modules from the dashboard — or ask the AI assistant for help.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-title">Get results instantly</div>
+      <div class="step-desc">Every scan generates a detailed report with risk scores, findings, and actionable advice.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="cta">
+  <div class="cta-box">
+    <h2>Ready to get protected?</h2>
+    <p>Create your free account and start scanning in under 60 seconds.</p>
+    <a href="/login#register" class="btn-hero-primary" style="display:inline-block">
+      🛡 Create Free Account
+    </a>
+  </div>
+</section>
+
+<footer>
+  ⬡ CYBERSENTINEL &nbsp;·&nbsp; Built for education &amp; ethical use only &nbsp;·&nbsp; No tracking · No ads
+</footer>
+
+</body>
+</html>

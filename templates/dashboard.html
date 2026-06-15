@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CyberSentinel — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080b12;--surface:#0d1117;--panel:#111820;--border:#1e2d3d;
+  --accent:#00e5ff;--accent2:#7c3aed;--green:#00ff88;--yellow:#ffd700;--red:#ff3b5c;
+  --text:#c9d1d9;--muted:#586069;
+  --mono:'Share Tech Mono',monospace;--sans:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(0,229,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,.03) 1px,transparent 1px);
+  background-size:44px 44px;
+}
+
+/* ═══════ LAYOUT ═══════ */
+.app{position:relative;z-index:1;display:flex;height:100vh}
+
+/* ── Sidebar ── */
+.sidebar{
+  width:230px;flex-shrink:0;background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+}
+.logo{
+  font-family:var(--mono);color:var(--accent);
+  padding:20px 18px 16px;border-bottom:1px solid var(--border);
+  letter-spacing:.1em;font-size:12px;
+}
+.logo span{display:block;font-size:17px;margin-bottom:2px;font-weight:bold}
+.nav{flex:1;padding:10px 0}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 18px;cursor:pointer;font-size:13px;color:var(--muted);
+  border-left:3px solid transparent;transition:all .15s;user-select:none;
+}
+.nav-item:hover{color:var(--text);background:rgba(0,229,255,.04)}
+.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(0,229,255,.07)}
+.nav-icon{font-size:15px;width:20px;text-align:center}
+.nav-divider{height:1px;background:var(--border);margin:6px 18px}
+
+/* User area */
+.user-area{padding:12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.user-card{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;background:var(--panel);border-radius:8px;border:1px solid var(--border);
+}
+.avatar{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:14px;color:#fff;
+}
+.u-name{font-size:12px;font-family:var(--mono);color:var(--text);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.u-email{font-size:10px;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ai-btn{
+  background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(0,229,255,.08));
+  border:1px solid rgba(124,58,237,.4);color:#a78bfa;
+  font-family:var(--mono);font-size:11px;padding:8px;border-radius:8px;
+  cursor:pointer;text-align:center;transition:all .2s;letter-spacing:.05em;
+}
+.ai-btn:hover{background:linear-gradient(135deg,rgba(124,58,237,.35),rgba(0,229,255,.15))}
+.logout-btn{
+  background:none;border:1px solid var(--border);color:var(--muted);
+  font-family:var(--mono);font-size:11px;padding:7px;border-radius:6px;
+  cursor:pointer;transition:all .2s;letter-spacing:.04em;
+}
+.logout-btn:hover{color:var(--red);border-color:rgba(255,59,92,.4)}
+
+/* ── Main ── */
+.main{flex:1;overflow-y:auto;padding:26px 28px;display:flex;flex-direction:column;gap:18px}
+.page{display:none;flex-direction:column;gap:16px}
+.page.active{display:flex}
+.ph{margin-bottom:2px}
+.ph h1{font-family:var(--mono);font-size:19px;color:var(--accent);letter-spacing:.06em}
+.ph p{font-size:13px;color:var(--muted);margin-top:3px}
+
+/* ── Cards ── */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px}
+.ct{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
+
+/* ── Fields ── */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label{font-size:11px;color:var(--muted);font-family:var(--mono);letter-spacing:.06em}
+input[type=text],input[type=password]{
+  background:var(--surface);border:1px solid var(--border);border-radius:6px;
+  color:var(--text);font-family:var(--mono);font-size:13px;padding:9px 13px;
+  outline:none;transition:border-color .2s;width:100%;
+}
+input:focus{border-color:var(--accent)}
+
+/* ── Buttons ── */
+.btn{
+  background:transparent;border:1px solid var(--accent);color:var(--accent);
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;padding:9px 20px;
+  border-radius:6px;cursor:pointer;transition:all .2s;text-transform:uppercase;
+}
+.btn:hover{background:rgba(0,229,255,.1)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-g{border-color:var(--green);color:var(--green)}
+.btn-g:hover{background:rgba(0,255,136,.08)}
+.btn-r{border-color:var(--red);color:var(--red)}
+.btn-r:hover{background:rgba(255,59,92,.08)}
+
+/* ── Result panels ── */
+.result{display:none}
+.result.show{display:block}
+
+.verdict{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:15px;font-weight:bold;
+  padding:8px 16px;border-radius:6px;margin-bottom:12px;
+}
+.vg{color:var(--green);background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.3)}
+.vy{color:var(--yellow);background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.3)}
+.vr{color:var(--red);background:rgba(255,59,92,.08);border:1px solid rgba(255,59,92,.3)}
+
+/* Live badge */
+.live-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:11px;padding:4px 10px;
+  border-radius:20px;border:1px solid;margin-bottom:10px;
+}
+.lb-ok{color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.07)}
+.lb-ok::before{content:'●';animation:blink 2s infinite}
+.lb-dead{color:var(--muted);border-color:var(--border)}
+.lb-slow{color:var(--yellow);border-color:rgba(255,215,0,.3);background:rgba(255,215,0,.07)}
+.lb-err{color:var(--red);border-color:rgba(255,59,92,.3);background:rgba(255,59,92,.07)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Risk bar */
+.rb-wrap{margin:10px 0}
+.rb-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--mono)}
+.rb-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.rb-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+
+/* Tags */
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.tag{font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:4px;border:1px solid var(--border);color:var(--muted)}
+.tw{color:var(--yellow);border-color:rgba(255,215,0,.3);background:rgba(255,215,0,.06)}
+.td{color:var(--red);border-color:rgba(255,59,92,.3);background:rgba(255,59,92,.06)}
+.to{color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.06)}
+
+/* Score ring */
+.score-wrap{display:flex;align-items:center;gap:16px;margin-bottom:10px}
+.ring{position:relative;width:74px;height:74px;flex-shrink:0}
+.ring svg{transform:rotate(-90deg)}
+.rg-bg{fill:none;stroke:var(--border);stroke-width:6}
+.rg-fill{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1)}
+.ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono)}
+.ring-num{font-size:18px;font-weight:bold}
+.ring-sub{font-size:10px;color:var(--muted)}
+
+/* Port table */
+.pt{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono)}
+.pt th{text-align:left;color:var(--muted);font-size:10px;padding:5px 9px;border-bottom:1px solid var(--border)}
+.pt td{padding:7px 9px;border-bottom:1px solid rgba(30,45,61,.5)}
+.pt tr:last-child td{border-bottom:none}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}
+.dot.high{background:var(--red)}.dot.medium{background:var(--yellow)}.dot.low{background:var(--green)}
+
+/* Password suggestions */
+.ps{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:7px 11px;margin-bottom:5px;font-family:var(--mono);font-size:12px;color:var(--accent)}
+.cpbtn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:2px 5px}
+.cpbtn:hover{color:var(--accent)}
+.hash-box{font-family:var(--mono);font-size:10px;word-break:break-all;padding:9px 13px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--muted);margin-top:6px}
+
+/* Dropzone */
+.drop{border:2px dashed var(--border);border-radius:8px;padding:26px;text-align:center;cursor:pointer;transition:border-color .2s}
+.drop:hover{border-color:var(--accent)}
+.drop p{color:var(--muted);font-size:13px;margin-top:6px}
+.drop .di{font-size:26px}
+.key-box{font-family:var(--mono);font-size:10px;word-break:break-all;padding:10px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.3);border-radius:6px;color:#a78bfa;margin:8px 0}
+
+/* Dashboard grid */
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.sc{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center}
+.sn{font-family:var(--mono);font-size:24px;color:var(--accent)}
+.sl{font-size:10px;color:var(--muted);margin-top:3px}
+.row2{display:flex;gap:10px}
+.row2 .card{flex:1}
+
+/* History */
+.ht{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono)}
+.ht th{text-align:left;color:var(--muted);font-size:10px;padding:5px 9px;border-bottom:1px solid var(--border)}
+.ht td{padding:7px 9px;border-bottom:1px solid rgba(30,45,61,.4);color:var(--text)}
+.ht tr:last-child td{border-bottom:none}
+.empty-row{color:var(--muted);font-size:12px;padding:12px 0}
+
+.slbl{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin:10px 0 5px}
+.irow{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:5px}
+.irow span strong{color:var(--text)}
+
+/* ── AI Panel ── */
+.ai-panel{
+  position:fixed;right:0;top:0;bottom:0;width:330px;
+  background:var(--surface);border-left:1px solid var(--border);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);z-index:200;
+}
+.ai-panel.open{transform:translateX(0)}
+.ai-hdr{padding:15px 17px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ai-title{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:.08em}
+.ai-status{font-size:10px;color:var(--green);display:flex;align-items:center;gap:4px}
+.ai-status::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.ai-x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:17px;line-height:1}
+.ai-msgs{flex:1;overflow-y:auto;padding:13px;display:flex;flex-direction:column;gap:9px}
+.msg{max-width:88%;font-size:13px;line-height:1.55;padding:9px 12px;border-radius:10px}
+.msg.bot{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.12);color:var(--text);align-self:flex-start;border-bottom-left-radius:2px}
+.msg.user{background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.25);color:#c4b5fd;align-self:flex-end;border-bottom-right-radius:2px}
+.ai-chips{padding:0 13px 8px;display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:10px;padding:4px 9px;border:1px solid var(--border);border-radius:20px;color:var(--muted);cursor:pointer;transition:all .2s;background:none;font-family:var(--sans)}
+.chip:hover{color:var(--accent);border-color:rgba(0,229,255,.4)}
+.ai-in-row{padding:11px 13px;border-top:1px solid var(--border);display:flex;gap:7px}
+.ai-in{flex:1;background:var(--panel);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--sans);font-size:13px;padding:7px 10px;outline:none;resize:none;line-height:1.4}
+.ai-in:focus{border-color:var(--accent)}
+.ai-snd{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);border-radius:6px;padding:0 12px;cursor:pointer;font-size:15px;transition:all .2s}
+.ai-snd:hover{background:rgba(0,229,255,.2)}
+
+.sp{display:inline-block;width:11px;height:11px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar">
+  <div class="logo"><span>⬡ CYBER</span>SENTINEL</div>
+  <nav class="nav">
+    <div class="nav-item active" data-p="home">  <span class="nav-icon">⬡</span> Home</div>
+    <div class="nav-item" data-p="phishing">     <span class="nav-icon">🔗</span> Phishing Detector</div>
+    <div class="nav-item" data-p="password">     <span class="nav-icon">🔑</span> Password Analyzer</div>
+    <div class="nav-item" data-p="scanner">      <span class="nav-icon">📡</span> Vuln Scanner</div>
+    <div class="nav-item" data-p="encrypt">      <span class="nav-icon">🔒</span> File Encryption</div>
+    <div class="nav-divider"></div>
+    <div class="nav-item" data-p="history">      <span class="nav-icon">📋</span> Scan History</div>
+  </nav>
+  <div class="user-area">
+    <button class="ai-btn" onclick="toggleAI()">⚡ AI ASSISTANT</button>
+    <div class="user-card">
+      <div class="avatar" id="av">?</div>
+      <div>
+        <div class="u-name" id="un">{{ username }}</div>
+        <div class="u-email" id="ue">Loading...</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">⏻ LOGOUT</button>
+  </div>
+</aside>
+
+<!-- ── Main ── -->
+<main class="main">
+
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <div class="ph"><h1>// DASHBOARD</h1><p>Welcome back, <strong style="color:var(--text)">{{ username }}</strong>. Your security operations center.</p></div>
+    <div class="sg">
+      <div class="sc"><div class="sn" id="s0">0</div><div class="sl">URLs Analyzed</div></div>
+      <div class="sc"><div class="sn" id="s1">0</div><div class="sl">Passwords Checked</div></div>
+      <div class="sc"><div class="sn" id="s2">0</div><div class="sl">Port Scans</div></div>
+      <div class="sc"><div class="sn" id="s3">0</div><div class="sl">Files Encrypted</div></div>
+    </div>
+    <div class="row2">
+      <div class="card" style="flex:1.4">
+        <div class="ct">Quick Start</div>
+        <div style="font-size:13px;line-height:1.85;color:var(--muted)">
+          <p>→ <strong style="color:var(--text)">Phishing Detector</strong> — Paste any suspicious URL.</p>
+          <p>→ <strong style="color:var(--text)">Password Analyzer</strong> — Check how strong your password is.</p>
+          <p>→ <strong style="color:var(--text)">Vuln Scanner</strong> — Find open ports on any host.</p>
+          <p>→ <strong style="color:var(--text)">File Encryption</strong> — AES-256 encrypt any file.</p>
+          <p style="margin-top:8px">→ <strong style="color:#a78bfa">⚡ AI Assistant</strong> — Ask any security question.</p>
+        </div>
+      </div>
+      <div class="card" style="flex:1">
+        <div class="ct">Security Tip</div>
+        <div style="font-size:13px;line-height:1.7;color:var(--text)" id="tip"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHISHING -->
+  <div class="page" id="page-phishing">
+    <div class="ph"><h1>// PHISHING DETECTOR</h1><p>Check any URL for phishing patterns and test if the site is live.</p></div>
+    <div class="card">
+      <div class="ct">Enter URL</div>
+      <div class="field">
+        <label>FULL URL TO ANALYZE</label>
+        <input type="text" id="p-url" placeholder="https://example.com" onkeydown="if(event.key==='Enter')runPhishing()"/>
+      </div>
+      <button class="btn" id="p-btn" onclick="runPhishing()">▶ ANALYZE URL</button>
+    </div>
+    <div class="card result" id="p-res">
+      <div class="ct">ANALYSIS RESULT</div>
+      <div id="p-verdict"></div>
+      <div id="p-live"></div>
+      <div class="rb-wrap">
+        <div class="rb-lbl"><span>RISK SCORE</span><span id="p-slbl">0 / 100</span></div>
+        <div class="rb-track"><div class="rb-fill" id="p-bar" style="width:0%"></div></div>
+      </div>
+      <div class="irow" id="p-info"></div>
+      <div class="slbl">Suspicious Indicators</div>
+      <div class="tags" id="p-tags"></div>
+    </div>
+  </div>
+
+  <!-- PASSWORD -->
+  <div class="page" id="page-password">
+    <div class="ph"><h1>// PASSWORD ANALYZER</h1><p>Check password strength, detect weak patterns, get secure alternatives.</p></div>
+    <div class="card">
+      <div class="ct">Password Input</div>
+      <div class="field"><label>YOUR NAME (optional)</label><input type="text" id="pw-name" placeholder="Helps detect personal patterns"/></div>
+      <div class="field"><label>DATE OF BIRTH — DDMMYYYY (optional)</label><input type="text" id="pw-dob" placeholder="e.g. 14062001" maxlength="8"/></div>
+      <div class="field"><label>PASSWORD TO ANALYZE</label><input type="password" id="pw-in" placeholder="Type your password..." onkeydown="if(event.key==='Enter')runPassword()"/></div>
+      <button class="btn" onclick="runPassword()">▶ ANALYZE PASSWORD</button>
+    </div>
+    <div class="card result" id="pw-res">
+      <div class="ct">STRENGTH REPORT</div>
+      <div class="score-wrap">
+        <div class="ring">
+          <svg viewBox="0 0 74 74" width="74" height="74">
+            <circle class="rg-bg" cx="37" cy="37" r="31"/>
+            <circle class="rg-fill" id="pw-ring" cx="37" cy="37" r="31" stroke-dasharray="195" stroke-dashoffset="195"/>
+          </svg>
+          <div class="ring-text"><span class="ring-num" id="pw-snum">0</span><span class="ring-sub">/ 6</span></div>
+        </div>
+        <div><div id="pw-verdict"></div><div style="font-size:11px;color:var(--muted);margin-top:5px" id="pw-linfo"></div></div>
+      </div>
+      <div id="pw-warns-w" style="display:none"><div class="slbl">⚠ Security Warnings</div><div class="tags" id="pw-warns"></div></div>
+      <div id="pw-sugg-w" style="display:none"><div class="slbl">Suggestions</div><div class="tags" id="pw-sugg"></div></div>
+      <div class="slbl">Suggested Strong Passwords</div>
+      <div id="pw-slist"></div>
+      <div class="slbl">SHA-256 Hash</div>
+      <div class="hash-box" id="pw-hash"></div>
+    </div>
+  </div>
+
+  <!-- SCANNER -->
+  <div class="page" id="page-scanner">
+    <div class="ph"><h1>// VULNERABILITY SCANNER</h1><p>Scan open ports on any IP or hostname and get remediation advice.</p></div>
+    <div class="card">
+      <div class="ct">Target</div>
+      <div class="field"><label>IP ADDRESS OR HOSTNAME</label><input type="text" id="sc-target" placeholder="e.g. 192.168.1.1 or scanme.nmap.org" onkeydown="if(event.key==='Enter')runScan()"/></div>
+      <button class="btn" onclick="runScan()">▶ START SCAN</button>
+      <div id="sc-prog" style="display:none;margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--muted)">
+        <span class="sp"></span>Scanning 9 ports — may take up to 10 seconds...
+      </div>
+    </div>
+    <div class="card result" id="sc-res">
+      <div class="ct">SCAN REPORT</div>
+      <div id="sc-verdict" style="margin-bottom:10px"></div>
+      <div id="sc-open-s" style="display:none">
+        <div class="slbl">Open Ports</div>
+        <table class="pt"><thead><tr><th>PORT</th><th>SERVICE</th><th>RISK</th><th>ADVICE</th></tr></thead>
+        <tbody id="sc-tbody"></tbody></table>
+      </div>
+      <div style="margin-top:10px"><div class="slbl">Closed / Filtered</div><div class="tags" id="sc-closed"></div></div>
+    </div>
+  </div>
+
+  <!-- ENCRYPTION -->
+  <div class="page" id="page-encrypt">
+    <div class="ph"><h1>// FILE ENCRYPTION</h1><p>AES-256 (Fernet) — encrypt and decrypt any file entirely on your server.</p></div>
+    <div class="row2">
+      <!-- Encrypt -->
+      <div class="card">
+        <div class="ct">Encrypt a File</div>
+        <div class="drop" onclick="document.getElementById('e-file').click()">
+          <div class="di">📂</div><p>Click to choose a file</p>
+          <div id="e-fname" style="font-family:var(--mono);font-size:11px;color:var(--accent);margin-top:5px"></div>
+        </div>
+        <input type="file" id="e-file" style="display:none" onchange="document.getElementById('e-fname').textContent=this.files[0]?.name||''"/>
+        <button class="btn btn-g" style="margin-top:12px;width:100%" onclick="doEncrypt()">🔒 ENCRYPT FILE</button>
+        <div class="result" id="e-res" style="margin-top:12px">
+          <div class="slbl">⚠ Your Encryption Key — save this, you cannot decrypt without it</div>
+          <div class="key-box" id="e-key"></div>
+          <button class="cpbtn" style="color:var(--muted);width:100%;margin-bottom:6px" onclick="copyKey()">📋 Copy Key to Clipboard</button>
+          <button class="btn" style="width:100%" onclick="dlEnc()">⬇ DOWNLOAD ENCRYPTED FILE</button>
+        </div>
+      </div>
+      <!-- Decrypt -->
+      <div class="card">
+        <div class="ct">Decrypt a File</div>
+        <div class="field">
+          <label>ENCRYPTED FILE</label>
+          <input type="text" id="d-fname" placeholder="Click to select..." readonly onclick="document.getElementById('d-file').click()" style="cursor:pointer"/>
+          <input type="file" id="d-file" style="display:none" onchange="document.getElementById('d-fname').value=this.files[0]?.name||''"/>
+        </div>
+        <div class="field"><label>PASTE YOUR ENCRYPTION KEY</label><input type="text" id="d-key" placeholder="Base64 key from the encrypt step"/></div>
+        <button class="btn btn-r" style="width:100%" onclick="doDecrypt()">🔓 DECRYPT FILE</button>
+        <div class="result" id="d-res" style="margin-top:10px">
+          <button class="btn btn-g" style="width:100%" onclick="dlDec()">⬇ DOWNLOAD DECRYPTED FILE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="page" id="page-history">
+    <div class="ph"><h1>// SCAN HISTORY</h1><p>Your last 40 scans, automatically saved to your account.</p></div>
+    <div class="card">
+      <div class="ct">Recent Activity</div>
+      <table class="ht">
+        <thead><tr><th>TYPE</th><th>TARGET</th><th>VERDICT</th><th>DATE</th></tr></thead>
+        <tbody id="hist-body"><tr><td colspan="4" class="empty-row">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+</div><!-- end .app -->
+
+<!-- ── AI Panel ── -->
+<div class="ai-panel" id="ai-panel">
+  <div class="ai-hdr">
+    <div><div class="ai-title">⚡ SENTINEL-AI</div><div class="ai-status">Online</div></div>
+    <button class="ai-x" onclick="toggleAI()">✕</button>
+  </div>
+  <div class="ai-msgs" id="ai-msgs">
+    <div class="msg bot">Hi! I'm Sentinel-AI. Ask me anything about cybersecurity, or ask me to explain your scan results.</div>
+  </div>
+  <div class="ai-chips">
+    <button class="chip" onclick="chip('What is phishing?')">What is phishing?</button>
+    <button class="chip" onclick="chip('How to make a strong password?')">Strong password tips</button>
+    <button class="chip" onclick="chip('What are risks of open ports?')">Open port risks</button>
+    <button class="chip" onclick="chip('How does AES encryption work?')">AES encryption</button>
+    <button class="chip" onclick="chip('How do I stay safe online?')">Stay safe online</button>
+  </div>
+  <div class="ai-in-row">
+    <textarea class="ai-in" id="ai-in" rows="1" placeholder="Ask a cybersecurity question..." onkeydown="aiKey(event)"></textarea>
+    <button class="ai-snd" onclick="sendAI()">➤</button>
+  </div>
+</div>
+
+<script>
+// ── State ──
+const S = {scans:0,pwd:0,ports:0,files:0};
+let encBlob=null,encName='',decBlob=null,decName='';
+const aiHistory = [];
+
+// ── Tips ──
+const TIPS = [
+  "Never click links in unexpected emails or messages. Always type URLs directly into your browser.",
+  "Use a unique, strong password for every account. A password manager makes this easy.",
+  "Enable two-factor authentication (2FA) on every account that supports it.",
+  "Keep all software and your OS updated — most attacks exploit already-patched vulnerabilities.",
+  "Always verify HTTPS and a valid certificate before entering sensitive information on any site.",
+  "Encrypt sensitive files before sharing them, even over email or cloud services.",
+  "Regularly scan your network for unexpected open ports — attackers probe these constantly.",
+];
+document.getElementById('tip').textContent = '"' + TIPS[Math.floor(Math.random()*TIPS.length)] + '"';
+
+// ── Load user ──
+(async () => {
+  try {
+    const r = await fetch('/api/me');
+    if (r.status===401) { window.location='/login'; return; }
+    const u = await r.json();
+    document.getElementById('av').textContent  = u.username[0].toUpperCase();
+    document.getElementById('un').textContent  = u.username;
+    document.getElementById('ue').textContent  = u.email;
+  } catch {}
+})();
+
+// ── Navigation ──
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('page-'+el.dataset.p).classList.add('active');
+    if (el.dataset.p==='history') loadHistory();
+  });
+});
+
+function updStats() {
+  ['s0','s1','s2','s3'].forEach((id,i)=>document.getElementById(id).textContent=[S.scans,S.pwd,S.ports,S.files][i]);
+}
+
+// ── Logout ──
+async function doLogout() {
+  await fetch('/api/logout',{method:'POST'});
+  window.location = '/login';
+}
+
+// ── History ──
+async function loadHistory() {
+  try {
+    const rows = await (await fetch('/api/history')).json();
+    const tb = document.getElementById('hist-body');
+    if (!rows.length) { tb.innerHTML='<tr><td colspan="4" class="empty-row">No scans yet. Run your first scan!</td></tr>'; return; }
+    const ic = {phishing:'🔗',password:'🔑',scan:'📡',encrypt:'🔒'};
+    const vc = {SAFE:'to',SUSPICIOUS:'tw',PHISHING:'td',LOW:'to',MEDIUM:'tw',HIGH:'td',STRONG:'to',WEAK:'td',ENCRYPTED:'to'};
+    tb.innerHTML = rows.map(r=>{
+      const cls = vc[r.verdict]||'';
+      return `<tr>
+        <td>${ic[r.type]||'?'} ${r.type.toUpperCase()}</td>
+        <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.target}</td>
+        <td><span class="tag ${cls}">${r.verdict}</span></td>
+        <td style="color:var(--muted);font-size:10px">${r.created}</td>
+      </tr>`;
+    }).join('');
+  } catch {}
+}
+
+// ══ AI ASSISTANT ══
+function toggleAI() { document.getElementById('ai-panel').classList.toggle('open'); }
+function chip(q) { document.getElementById('ai-in').value=q; sendAI(); }
+function aiKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAI();} }
+
+function addMsg(text, who) {
+  const c = document.getElementById('ai-msgs');
+  const d = document.createElement('div');
+  d.className = `msg ${who}`;
+  d.innerHTML = text.replace(/\n/g,'<br>');
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
+  return d;
+}
+
+async function sendAI() {
+  const inp = document.getElementById('ai-in');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  addMsg(text,'user');
+  aiHistory.push({role:'user',content:text});
+  const loading = addMsg('<span class="sp"></span>Thinking...','bot');
+  try {
+    // Calls our Flask backend — API key stays safe on the server
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ messages: aiHistory })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    const reply = data.reply || 'Sorry, I had trouble responding.';
+    aiHistory.push({role:'assistant', content:reply});
+    loading.className = 'msg bot';
+    loading.innerHTML = reply.replace(/\n/g,'<br>');
+    document.getElementById('ai-msgs').scrollTop = 99999;
+  } catch(e) {
+    loading.className = 'msg bot';
+    loading.innerHTML = `⚠ ${e.message || 'Error reaching AI. Check that GEMINI_API_KEY is set.'}`;
+  }
+}
+
+// ══ MODULE 1: PHISHING ══
+async function runPhishing() {
+  const url = document.getElementById('p-url').value.trim();
+  if (!url) return alert('Please enter a URL.');
+  const btn = document.getElementById('p-btn');
+  btn.disabled=true; btn.innerHTML='<span class="sp"></span>Analyzing...';
+
+  try {
+    const d = await (await fetch('/api/phishing',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({url})
+    })).json();
+    if (d.error) { alert(d.error); return; }
+    S.scans++; updStats();
+
+    const em = {SAFE:'✅',SUSPICIOUS:'⚠',PHISHING:'🚨'};
+    const vc = {SAFE:'vg',SUSPICIOUS:'vy',PHISHING:'vr'};
+    document.getElementById('p-verdict').innerHTML =
+      `<div class="verdict ${vc[d.verdict]}">${em[d.verdict]} ${d.verdict}</div>`;
+
+    // Live status badge
+    const liveMap = {
+      reachable:`<div class="live-badge lb-ok">LIVE — HTTP ${d.status_code} · ${d.response_time}ms response</div>`,
+      unreachable:`<div class="live-badge lb-dead">✕ UNREACHABLE — Site did not respond</div>`,
+      timeout:`<div class="live-badge lb-slow">⏱ TIMEOUT — Server too slow or filtered</div>`,
+      error:`<div class="live-badge lb-err">⚠ ERROR — HTTP ${d.status_code||'?'}</div>`
+    };
+    document.getElementById('p-live').innerHTML = liveMap[d.live_status]||'';
+
+    const bar = document.getElementById('p-bar');
+    bar.style.width = d.risk_score+'%';
+    bar.style.background = d.risk_score<20?'var(--green)':d.risk_score<50?'var(--yellow)':'var(--red)';
+    document.getElementById('p-slbl').textContent = `${d.risk_score} / 100`;
+
+    let info = `<span>URL: <strong>${d.url.length>60?d.url.slice(0,57)+'...':d.url}</strong></span>`;
+    if (d.redirected) info += `<span>↪ Redirects to: <strong>${d.final_url}</strong></span>`;
+    document.getElementById('p-info').innerHTML = info;
+
+    document.getElementById('p-tags').innerHTML = d.reasons.length
+      ? d.reasons.map(r=>`<span class="tag ${d.risk_score>=50?'td':'tw'}">${r}</span>`).join('')
+      : '<span class="tag to">✓ No suspicious indicators found</span>';
+
+    document.getElementById('p-res').classList.add('show');
+  } catch { alert('Server error. Is Flask running?'); }
+  finally { btn.disabled=false; btn.textContent='▶ ANALYZE URL'; }
+}
+
+// ══ MODULE 2: PASSWORD ══
+async function runPassword() {
+  const pwd = document.getElementById('pw-in').value;
+  if (!pwd) return alert('Please enter a password.');
+  const d = await (await fetch('/api/password',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name:document.getElementById('pw-name').value,dob:document.getElementById('pw-dob').value,password:pwd})
+  })).json();
+  if (d.error) return alert(d.error);
+  S.pwd++; updStats();
+
+  const ring = document.getElementById('pw-ring');
+  const pct  = d.score / d.max_score;
+  ring.style.strokeDashoffset = 195 - pct*195;
+  ring.style.stroke = d.strength==='STRONG'?'var(--green)':d.strength==='MEDIUM'?'var(--yellow)':'var(--red)';
+  document.getElementById('pw-snum').textContent = d.score;
+
+  const lm = {WEAK:['🔴 WEAK','var(--red)'],MEDIUM:['🟡 MEDIUM','var(--yellow)'],STRONG:['🟢 STRONG','var(--green)']};
+  const [lbl,col] = lm[d.strength];
+  document.getElementById('pw-verdict').innerHTML =
+    `<div class="verdict" style="color:${col};background:${col}18;border:1px solid ${col}50">${lbl}</div>`;
+  document.getElementById('pw-linfo').textContent = `Length: ${d.length} characters`;
+
+  const ww = document.getElementById('pw-warns-w');
+  if (d.warnings.length){ww.style.display='';document.getElementById('pw-warns').innerHTML=d.warnings.map(w=>`<span class="tag td">⚠ ${w}</span>`).join('')}else{ww.style.display='none'}
+  const sw = document.getElementById('pw-sugg-w');
+  if (d.suggestions.length){sw.style.display='';document.getElementById('pw-sugg').innerHTML=d.suggestions.map(s=>`<span class="tag tw">${s}</span>`).join('')}else{sw.style.display='none'}
+
+  document.getElementById('pw-slist').innerHTML = d.suggested_passwords.map(p=>
+    `<div class="ps">${p}<button class="cpbtn" onclick="navigator.clipboard.writeText('${p}').then(()=>{this.textContent='✓';setTimeout(()=>this.textContent='copy',1300)})">copy</button></div>`
+  ).join('');
+  document.getElementById('pw-hash').textContent = d.sha256;
+  document.getElementById('pw-res').classList.add('show');
+}
+
+// ══ MODULE 3: SCANNER ══
+async function runScan() {
+  const target = document.getElementById('sc-target').value.trim();
+  if (!target) return alert('Please enter a target.');
+  document.getElementById('sc-prog').style.display='';
+  document.getElementById('sc-res').classList.remove('show');
+  try {
+    const d = await (await fetch('/api/scan',{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target})
+    })).json();
+    if (d.error){alert(d.error);return}
+    S.ports++; updStats();
+
+    const vc={HIGH:'vr',MEDIUM:'vy',LOW:'vg'};
+    const ve={HIGH:'🚨',MEDIUM:'⚠',LOW:'✅'};
+    document.getElementById('sc-verdict').innerHTML =
+      `<div class="verdict ${vc[d.overall_risk]}">${ve[d.overall_risk]} ${d.overall_risk} RISK — ${d.total_open} open port(s) on ${d.target}</div>`;
+
+    const os = document.getElementById('sc-open-s');
+    if (d.open_ports.length){
+      os.style.display='';
+      document.getElementById('sc-tbody').innerHTML=d.open_ports.map(p=>
+        `<tr>
+          <td style="color:var(--accent)">${p.port}</td>
+          <td>${p.name}</td>
+          <td><span class="dot ${p.risk}"></span>${p.risk.toUpperCase()}</td>
+          <td style="color:var(--muted);font-size:11px">${p.advice}</td>
+        </tr>`
+      ).join('');
+    }else{os.style.display='none'}
+
+    document.getElementById('sc-closed').innerHTML = d.closed_ports.map(p=>`<span class="tag">${p.port} ${p.name}</span>`).join('');
+    document.getElementById('sc-res').classList.add('show');
+  }catch{alert('Server error.')}
+  finally{document.getElementById('sc-prog').style.display='none'}
+}
+
+// ══ MODULE 4: ENCRYPTION ══
+async function doEncrypt(){
+  const fi = document.getElementById('e-file');
+  if(!fi.files[0])return alert('Please select a file first.');
+  const fd=new FormData(); fd.append('file',fi.files[0]);
+  const d = await(await fetch('/api/encrypt',{method:'POST',body:fd})).json();
+  if(d.error)return alert(d.error);
+  S.files++; updStats();
+  document.getElementById('e-key').textContent = d.key;
+  const raw=atob(d.encrypted_data); const bytes=new Uint8Array(raw.length);
+  for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+  encBlob=new Blob([bytes]); encName=d.encrypted_filename;
+  document.getElementById('e-res').classList.add('show');
+}
+function copyKey(){
+  const k = document.getElementById('e-key').textContent;
+  navigator.clipboard.writeText(k).then(()=>alert('Key copied to clipboard! Store it safely.'));
+}
+function dlEnc(){
+  if(!encBlob)return;
+  const a=document.createElement('a'); a.href=URL.createObjectURL(encBlob); a.download=encName; a.click();
+}
+
+async function doDecrypt(){
+  const fi=document.getElementById('d-file');
+  const key=document.getElementById('d-key').value.trim();
+  if(!fi.files[0])return alert('Please select the encrypted file.');
+  if(!key)return alert('Please paste your encryption key.');
+  const fd=new FormData(); fd.append('file',fi.files[0]); fd.append('key',key);
+  const d=await(await fetch('/api/decrypt',{method:'POST',body:fd})).json();
+  if(d.error)return alert(d.error);
+  const raw=atob(d.decrypted_data); const bytes=new Uint8Array(raw.length);
+  for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+  decBlob=new Blob([bytes]);
+  decName=fi.files[0].name.replace('encrypted_','decrypted_');
+  document.getElementById('d-res').classList.add('show');
+}
+function dlDec(){
+  if(!decBlob)return;
+  const a=document.createElement('a'); a.href=URL.createObjectURL(decBlob); a.download=decName; a.click();
+}
+</script>
+</body>
+</html>
