@@ -3,3 +3,4 @@ requests
 cryptography
 gunicorn
 google-generativeai
+groq
