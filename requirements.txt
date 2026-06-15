@@ -1,3 +1,4 @@
 flask
-cryptography
 requests
+cryptography
+gunicorn
