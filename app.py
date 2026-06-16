@@ -197,6 +197,16 @@ def logout():
     session.clear()
     return jsonify({"ok":True})
 
+@app.route("/api/me")
+def me():
+    user = current_user()
+    if not user:
+        return jsonify({"logged_in": False})
+    return jsonify({
+        "logged_in": True,
+        "username": user["username"]
+    })
+
 # ───────── CHAT ─────────
 
 @app.route("/api/chat", methods=["POST"])
