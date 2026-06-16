@@ -18,7 +18,7 @@ from functools import wraps
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "cybersentinel.db")
+DB_PATH = "cybersentinel.db"
 
 last_call = {}
 COOLDOWN = 3
@@ -239,7 +239,9 @@ def debug_users():
 
 # ───────── MAIN ─────────
 
-if __name__ == "__main__":
-    init_db()
-    print("🔥 CyberSentinel running → http://127.0.0.1:5000")
-    app.run(debug=True)
+    if __name__ == "__main__":
+      init_db()
+    print("🔥 CyberSentinel running")
+
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
