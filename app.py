@@ -255,13 +255,25 @@ def logout():
 # ─────────────────────────────
 # landing + chat pages
 # ─────────────────────────────
+# ─────────────────────────────
+# PAGES
+# ─────────────────────────────
+
 @app.route("/")
 def landing():
     return render_template("landing.html")
 
+@app.route("/login")
+def login_page():
+    return render_template("login.html")
+
 @app.route("/chat")
 def chat_page():
     return render_template("chat.html")
+
+@app.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html")
 
 
 # ─────────────────────────────
