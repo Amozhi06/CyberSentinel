@@ -1,6 +1,3 @@
 flask
-requests
-cryptography
 gunicorn
-google-generativeai
-groq
+python-dotenv

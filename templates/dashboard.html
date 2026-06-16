@@ -552,7 +552,7 @@ async function sendAI() {
     document.getElementById('ai-msgs').scrollTop = 99999;
   } catch(e) {
     loading.className = 'msg bot';
-    loading.innerHTML = `⚠ ${e.message || 'Error reaching AI. Check that GEMINI_API_KEY is set.'}`;
+    loading.innerHTML = `⚠ ${e.message || 'Error reaching AI. Check that ANTHROPIC_API_KEY is set.'}`;
   }
 }
 
