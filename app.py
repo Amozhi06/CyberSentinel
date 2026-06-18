@@ -483,11 +483,19 @@ def debug_users():
         rows = conn.execute("SELECT username,email FROM users").fetchall()
     return jsonify([dict(r) for r in rows])
 
+
+# ───────── temp ─────────
+@app.route("/user-count")
+def user_count():
+    with get_db() as conn:
+        count = conn.execute(
+            "SELECT COUNT(*) FROM users"
+        ).fetchone()[0]
+
+    return jsonify({"users": count})
 # ───────── MAIN ─────────
 
-    if __name__ == "__main__":
-       init_db()
-    print("🔥 CyberSentinel running locally")
-
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+if __name__ == "__main__":
+    init_db()
+    print("🔥 CyberSentinel running at http://127.0.0.1:5000")
+    app.run(debug=True)
